@@ -9,6 +9,6 @@ class Item:
 
   def calculate_total(self) -> float:
     price_rule = RulesManager.get_rule(self.product.sku)
-    if price_rule.is_applicable(self.product.sku):
+    if price_rule:
         return price_rule.calculate_total(self.qty, self.product.unit_price)
     raise Exception("No applicable price rule found")

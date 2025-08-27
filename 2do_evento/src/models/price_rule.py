@@ -3,24 +3,44 @@ from src.interfaces.price_rule_interface import PriceRuleInterface
 
 
 class RegularPriceRule(PriceRuleInterface):
-    def is_applicable(self, sku: str):
-        pass
+    @staticmethod
+    def is_applicable(sku: str):
+        return sku[:2].upper() == "EA"
 
-    def calculate_total(self, qty: float, price: float) -> float:
-        pass
+    @staticmethod
+    def calculate_total(qty: float, price: float) -> float:
+        qty = int(qty)
+        return qty * price
 
 
 class WeightBasedPriceRule(PriceRuleInterface):
-    def is_applicable(self, sku: str):
-        pass
+    @staticmethod
+    def is_applicable(sku: str):
+        return sku[:2].upper() == "WE"
 
-    def calculate_total(self, qty: float, price: float) -> float:
-        pass
+    @staticmethod
+    def calculate_total(qty: float, price: float) -> float:
+        return qty * price
 
 
 class SpecialPriceRule(PriceRuleInterface):
-    def is_applicable(self, sku: str):
-        pass
 
-    def calculate_total(self, qty: float, price: float) -> float:
-        pass
+    DISCOUNT = 0.2
+
+    QUANTITY_THRESHOLD = 3
+
+    DISCOUNT_TOP = 0.5
+
+    @staticmethod
+    def is_applicable(sku: str):
+        return sku[:2].upper() == "SP"
+
+    @staticmethod
+    def calculate_total(qty: float, price: float) -> float:
+
+        total_discount = qty // SpecialPriceRule.QUANTITY_THRESHOLD
+
+        if total_discount > SpecialPriceRule.DISCOUNT_TOP:
+            return qty * price * (1 - SpecialPriceRule.DISCOUNT_TOP)
+
+        return qty * price * (1 - SpecialPriceRule.DISCOUNT)

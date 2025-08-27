@@ -5,6 +5,8 @@ from src.models.user import User
 from src.models.cart import Cart
 from src.models.item import Item
 from dataclasses import dataclass
+from src.models.rules_manager import RulesManager
+from src.models.price_rule import RegularPriceRule, WeightBasedPriceRule, SpecialPriceRule
 
 
 @dataclass
@@ -97,12 +99,9 @@ class App:
         if not cart.items:
             print("Carrito vacío.")
             return
-        total = 0.0
         print("\n--- Resumen de compra ---")
-        for item in cart.items:
-            subtotal = item.product.unit_price * item.qty
-            print(f"{item.product.name} x {item.qty} = ${subtotal}")
-            total += subtotal
+        self.current_user.cart.show_items_prices()
+        total = self.current_user.cart.calculate_total()
         print(f"Total a pagar: ${total}")
         confirm = input("¿Confirmar compra? (s/n): ").lower()
         if confirm == 's':
@@ -134,22 +133,28 @@ class App:
 
 
 if __name__ == "__main__":
-
-    
-
-
-
     # Productos hardcodeados
     products = [
-        Product(sku="A1", name="Manzana", description="Fruta roja",
+        Product(sku="WE", name="Manzana", description="Fruta roja",
                 units_available=10, unit_price=1.5),
-        Product(sku="B2", name="Pan", description="Pan integral",
+        Product(sku="SP", name="Pan", description="Pan integral",
                 units_available=20, unit_price=2.0),
-        Product(sku="C3", name="Leche", description="Leche descremada",
+        Product(sku="EA", name="Leche", description="Leche descremada",
                 units_available=15, unit_price=2.5),
     ]
+
+    # Agregar reglas
+    RulesManager.add_rule(RegularPriceRule)
+    RulesManager.add_rule(WeightBasedPriceRule)
+    RulesManager.add_rule(SpecialPriceRule)
+
     # Usuarios hardcodeados
     users = [User(cart=Cart()), User(cart=Cart())]
+
+    # Crear tienda
     store = Store(users=users, products=products)
-    app = App(store)
+
+    # Crear app
+    app = App(store, current_user=None)
+
     app.start()
