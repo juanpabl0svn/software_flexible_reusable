@@ -1,6 +1,6 @@
-from models.product import Product
+from src.models.product import Product
 from dataclasses import dataclass
-from models.rules_manager import RulesManager
+from src.models.rules_manager import RulesManager
 
 @dataclass
 class Item:

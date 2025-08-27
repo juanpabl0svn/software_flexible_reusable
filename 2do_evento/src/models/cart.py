@@ -1,4 +1,4 @@
-from models.item import Item
+from src.models.item import Item
 
 
 class Cart:

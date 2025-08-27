@@ -1,4 +1,4 @@
-from interfaces.price_rule_interface import PriceRuleInterface
+from src.interfaces.price_rule_interface import PriceRuleInterface
 
 
 
@@ -15,7 +15,7 @@ class WeightBasedPriceRule(PriceRuleInterface):
         pass
 
     def calculate_total(self, qty: float, price: float) -> float:
-          pass
+        pass
 
 
 class SpecialPriceRule(PriceRuleInterface):

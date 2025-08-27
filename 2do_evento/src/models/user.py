@@ -1,5 +1,5 @@
-from models.item import Item
-from models.cart import Cart
+from src.models.item import Item
+from src.models.cart import Cart
 from dataclasses import dataclass
 
 @dataclass
