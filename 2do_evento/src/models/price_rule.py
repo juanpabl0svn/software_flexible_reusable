@@ -38,6 +38,9 @@ class SpecialPriceRule(PriceRuleInterface):
     @staticmethod
     def calculate_total(qty: float, price: float) -> float:
 
+        if(qty < SpecialPriceRule.QUANTITY_THRESHOLD):
+            return qty * price
+
         total_discount = qty // SpecialPriceRule.QUANTITY_THRESHOLD
 
         if total_discount > SpecialPriceRule.DISCOUNT_TOP:

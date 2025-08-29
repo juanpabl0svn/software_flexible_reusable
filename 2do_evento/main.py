@@ -1,139 +1,136 @@
-
+from dataclasses import dataclass
 from src.models.store import Store
 from src.models.product import Product
 from src.models.user import User
 from src.models.cart import Cart
 from src.models.item import Item
-from dataclasses import dataclass
 from src.models.rules_manager import RulesManager
 from src.models.price_rule import RegularPriceRule, WeightBasedPriceRule, SpecialPriceRule
+from src.models.console import Console
+from src.models.options import Options
+from src.models.option import Option
 
 
 @dataclass
 class App:
     store: Store
-    current_user: User | None
+    ui: Console
+    current_user: User | None = None
+    options: Options | None = None
+
+    def set_options(self, options: Options):
+        self.options = options
+
+    def select_from_list(self, items: list, prompt: str):
+        choice = self.ui.ask_int(prompt)
+        if choice is None or not (1 <= choice <= len(items)):
+            self.ui.show_message("Selección inválida.")
+            return None
+        return items[choice - 1]
 
     def login(self):
-        print("\n=== Iniciar sesión ===")
+        self.ui.show_message("\n=== Iniciar sesión ===")
         for idx, _ in enumerate(self.store.users):
-            number = idx + 1
-            print(f"{number}. Usuario {number}")
-        try:
-            choice = int(input("Seleccione usuario: "))
-            if 1 <= choice <= len(self.store.users):
-                self.current_user = self.store.users[choice-1]
-                print(f"Sesión iniciada como Usuario {choice}\n")
-            else:
-                print("Opción inválida.")
-                self.login()
-        except ValueError:
-            print("Entrada inválida.")
+            self.ui.show_message(f"{idx+1}. Usuario {idx+1}")
+
+        user = self.select_from_list(self.store.users, "Seleccione usuario: ")
+        if user:
+            self.current_user = user
+            self.ui.show_message(f"Sesión iniciada como {user}\n")
+        else:
             self.login()
 
-    def display(self):
-        print("\n=== Menú Principal ===")
-        print("1. Ver productos")
-        print("2. Comprar producto")
-        print("3. Ver carrito")
-        print("4. Eliminar producto del carrito")
-        print("5. Checkout (finalizar compra)")
-        print("6. Salir")
+    def display_menu(self):
+        self.ui.show_message("\n=== Menú Principal ===")
+        self.options.show_options()
 
     def show_products(self):
-        print("\n--- Productos Disponibles ---")
+        self.ui.show_message("\n--- Productos Disponibles ---")
         for idx, p in enumerate(self.store.products):
-            print(
-                f"{idx+1}. {p.name} | {p.description} | Stock: {p.units_available} | Precio: ${p.unit_price}")
+            self.ui.show_message(
+                f"{idx+1}. {p.name} | {p.description} | Stock: {p.units_available} | Precio: ${p.unit_price}"
+            )
 
     def buy_product(self):
         self.show_products()
-        try:
-            idx = int(input("Seleccione producto (número): ")) - 1
-            if 0 <= idx < len(self.store.products):
-                product = self.store.products[idx]
-                qty = int(input(f"Cantidad de '{product.name}' a comprar: "))
-                if qty <= 0:
-                    print("Cantidad inválida.")
-                    return
-                if product.units_available >= qty:
-                    item = Item(product=product, qty=qty)
-                    self.store.add_product_to_cart(self.current_user, item)
-                    product.reduce_units(qty)
-                    print(f"Agregado {qty} x {product.name} al carrito.")
-                else:
-                    print("No hay suficiente stock disponible.")
-            else:
-                print("Producto inválido.")
-        except ValueError:
-            print("Entrada inválida.")
+        product: Product = self.select_from_list(
+            self.store.products, "Seleccione producto (número): ")
+        if not product:
+            return
+
+        qty = self.ui.ask_int(f"Cantidad de '{product.name}' a comprar: ")
+        if not qty or qty <= 0:
+            self.ui.show_message("Cantidad inválida.")
+            return
+
+        if product.units_available < qty:
+            self.ui.show_message("No hay suficiente stock disponible.")
+            return
+
+        self.store.add_product_to_cart(self.current_user, product, qty)
+
+        self.ui.show_message(f"Agregado {qty} x {product.name} al carrito.")
 
     def view_cart(self):
-        print("\n--- Carrito ---")
+        self.ui.show_message("\n--- Carrito ---")
         cart = self.current_user.cart
         if not cart.items:
-            print("Carrito vacío.")
+            self.ui.show_message("Carrito vacío.")
             return
-        for idx, item in enumerate(self.current_user.cart.items):
-            print(
-                f"{idx+1}. {item.product.name} x {item.qty} | Precio unitario: ${item.product.unit_price}")
+        for idx, item in enumerate(cart.items):
+            self.ui.show_message(
+                f"{idx+1}. {item.product.name} x {item.qty} | Precio unitario: ${item.product.unit_price}"
+            )
 
     def remove_from_cart(self):
-        if not self.current_user.cart.items:
-            print("Carrito vacío.")
+        cart = self.current_user.cart
+        if not cart.items:
+            self.ui.show_message("Carrito vacío.")
             return
+
         self.view_cart()
-        try:
-            idx = int(input("Seleccione producto a eliminar (número): ")) - 1
-            if 0 <= idx < len(self.current_user.cart.items):
-                item = self.current_user.cart.items[idx]
-                self.store.delete_item_from_cart(self.current_user, item)
-                print(f"Eliminado {item.product.name} del carrito.")
-            else:
-                print("Índice inválido.")
-        except ValueError:
-            print("Entrada inválida.")
+        item: Item = self.select_from_list(
+            cart.items, "Seleccione producto a eliminar (número): ")
+        if not item:
+            return
+
+        self.store.delete_item_from_cart(self.current_user, item)
+        self.ui.show_message(f"Eliminado {item.product.name} del carrito.")
 
     def checkout(self):
         cart = self.current_user.cart
         if not cart.items:
-            print("Carrito vacío.")
+            self.ui.show_message("Carrito vacío.")
             return
-        print("\n--- Resumen de compra ---")
-        self.current_user.cart.show_items_prices()
-        total = self.current_user.cart.calculate_total()
-        print(f"Total a pagar: ${total}")
-        confirm = input("¿Confirmar compra? (s/n): ").lower()
-        if confirm == 's':
+
+        self.ui.show_message("\n--- Resumen de compra ---")
+        cart.show_items_prices()
+        total = cart.calculate_total()
+        self.ui.show_message(f"Total a pagar: ${total}")
+
+        confirm = self.ui.ask_input("¿Confirmar compra? (s/n): ").lower()
+        if confirm == "s":
             self.store.finish_order(self.current_user)
-            print("¡Compra realizada!")
+            self.ui.show_message("¡Compra realizada!")
         else:
-            print("Compra cancelada.")
+            self.ui.show_message("Compra cancelada.")
+
+    def exit_app(self):
+        self.ui.show_message("Saliendo...")
+        raise SystemExit
 
     def start(self):
+        if not self.options:
+            raise ValueError("Options are required.")
+
         self.login()
         while True:
-            self.display()
-            choice = input("Seleccione una opción: ")
-            if choice == "1":
-                self.show_products()
-            elif choice == "2":
-                self.buy_product()
-            elif choice == "3":
-                self.view_cart()
-            elif choice == "4":
-                self.remove_from_cart()
-            elif choice == "5":
-                self.checkout()
-            elif choice == "6":
-                print("Saliendo...")
-                break
-            else:
-                print("Opción inválida. Intente de nuevo.")
+            self.display_menu()
+            choice = self.ui.ask_int("Seleccione una opción: ")
+            self.options.execute_option(choice)
 
 
 if __name__ == "__main__":
-    # Productos hardcodeados
     products = [
         Product(sku="WE", name="Manzana", description="Fruta roja",
                 units_available=10, unit_price=1.5),
@@ -143,18 +140,27 @@ if __name__ == "__main__":
                 units_available=15, unit_price=2.5),
     ]
 
-    # Agregar reglas
     RulesManager.add_rule(RegularPriceRule)
     RulesManager.add_rule(WeightBasedPriceRule)
     RulesManager.add_rule(SpecialPriceRule)
 
-    # Usuarios hardcodeados
     users = [User(cart=Cart()), User(cart=Cart())]
 
-    # Crear tienda
     store = Store(users=users, products=products)
 
-    # Crear app
-    app = App(store, current_user=None)
+    ui = Console()
+    app = App(store=store, ui=ui)
+
+    options_list = [
+        Option(text="Comprar producto", action=app.buy_product),
+        Option(text="Ver carrito", action=app.view_cart),
+        Option(text="Eliminar del carrito", action=app.remove_from_cart),
+        Option(text="Finalizar compra", action=app.checkout),
+        Option(text="Salir", action=app.exit_app),
+    ]
+
+    options = Options(options=options_list)
+
+    app.set_options(options)
 
     app.start()
