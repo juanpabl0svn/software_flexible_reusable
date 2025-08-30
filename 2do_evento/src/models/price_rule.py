@@ -1,8 +1,7 @@
-from src.interfaces.price_rule_interface import PriceRuleInterface
+from src.interfaces.price_rule_interface import IPriceRule
 
 
-
-class RegularPriceRule(PriceRuleInterface):
+class RegularPriceRule(IPriceRule):
     @staticmethod
     def is_applicable(sku: str):
         return sku[:2].upper() == "EA"
@@ -13,7 +12,7 @@ class RegularPriceRule(PriceRuleInterface):
         return qty * price
 
 
-class WeightBasedPriceRule(PriceRuleInterface):
+class WeightBasedPriceRule(IPriceRule):
     @staticmethod
     def is_applicable(sku: str):
         return sku[:2].upper() == "WE"
@@ -23,7 +22,7 @@ class WeightBasedPriceRule(PriceRuleInterface):
         return qty * price
 
 
-class SpecialPriceRule(PriceRuleInterface):
+class SpecialPriceRule(IPriceRule):
 
     DISCOUNT = 0.2
 

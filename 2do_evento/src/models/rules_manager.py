@@ -1,16 +1,16 @@
-from src.interfaces.price_rule_interface import PriceRuleInterface
+from src.interfaces.price_rule_interface import IPriceRule
 
 
 class RulesManager:
 
-  rules: list[PriceRuleInterface] = []
+  rules: list[IPriceRule] = []
 
   @staticmethod
-  def add_rule(rule: PriceRuleInterface):
+  def add_rule(rule: IPriceRule):
     RulesManager.rules.append(rule)
 
   @staticmethod
-  def get_rule(sku: str) -> PriceRuleInterface:
+  def get_rule(sku: str) -> IPriceRule:
     if not RulesManager.rules:
       raise ValueError("No pricing rules available")
     for rule in RulesManager.rules:
