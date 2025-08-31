@@ -3,8 +3,9 @@ from src.models.cart import Cart
 from src.models.product import Product
 
 class User:
-    def __init__(self):
+    def __init__(self, is_admin: bool = False):
         self.cart = Cart()
+        self.is_admin = is_admin
 
     def add_item_to_cart(self, product: Product, qty: float):
         self.cart.add_item(product, qty)

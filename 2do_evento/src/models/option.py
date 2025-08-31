@@ -5,6 +5,7 @@ from typing import Callable, Optional
 class Option:
   text: str
   action: Optional[Callable] = None
+  admin_only: bool = False
 
   def set_action(self, action: Callable):
     self.action = action

@@ -18,9 +18,6 @@ class App:
     current_user: User | None = None
     options: Options | None = None
 
-    def set_options(self, options: Options):
-        self.options = options
-
     def select_from_list(self, items: list, prompt: str):
         choice = self.ui.ask_int(prompt)
         if choice is None or not (1 <= choice <= len(items)):
@@ -30,19 +27,25 @@ class App:
 
     def login(self):
         self.ui.show_message("\n=== Iniciar sesión ===")
-        for idx, _ in enumerate(self.store.users):
-            self.ui.show_message(f"{idx+1}. Usuario {idx+1}")
+        for idx, user in enumerate(self.store.users):
+            self.ui.show_message(f"{idx+1}. Usuario {idx+1} {'(Admin)' if user.is_admin else ''}")
 
         user = self.select_from_list(self.store.users, "Seleccione usuario: ")
         if user:
             self.current_user = user
-            self.ui.show_message(f"Sesión iniciada como {user}\n")
+            self.ui.show_message(f"Sesión iniciada\n")
+            self.set_options()
         else:
             self.login()
 
     def display_menu(self):
         self.ui.show_message("\n=== Menú Principal ===")
-        self.options.show_options()
+        self.options.show_options(self.current_user)
+
+    def view_total_sales(self):
+        self.ui.show_message("\n=== Ventas Totales ===")
+        total_sales = self.store.total_sales
+        self.ui.show_message(f"Total de ventas: ${total_sales}")
 
     def show_products(self):
         self.ui.show_message("\n--- Productos Disponibles ---")
@@ -146,6 +149,38 @@ class App:
                 continue
             self.options.execute_option(choice)
 
+    def set_options(self):
+
+        ALL_OPTIONS = [
+            Option(text="Ver total de ventas", action=app.view_total_sales, admin_only=True),
+            Option(text="Ver productos", action=app.view_products),
+            Option(text="Ver carrito", action=app.view_cart),
+            Option(text="Seleccionar producto", action=app.buy_product),
+            Option(text="Eliminar del carrito", action=app.remove_from_cart),
+            Option(text="Finalizar compra", action=app.checkout),
+            Option(text="Cambiar perfil", action=app.login),
+            Option(text="Salir", action=app.exit_app),
+        ]
+
+        is_admin = self.current_user.is_admin 
+
+        options = []
+
+        if is_admin:
+            options = [opt for opt in ALL_OPTIONS if opt.admin_only]
+        else:
+            options = [opt for opt in ALL_OPTIONS if not opt.admin_only]
+
+        self.options = Options(options=options)
+
+    def start(self):
+        self.login()
+        while True:
+            self.display_menu()
+            choice = self.ui.ask_int("Seleccione una opción: ")
+            if choice is None:
+                continue
+            self.options.execute_option(choice)
 
 if __name__ == "__main__":
     products = [
@@ -161,25 +196,13 @@ if __name__ == "__main__":
     RulesManager.add_rule(WeightBasedPriceRule)
     RulesManager.add_rule(SpecialPriceRule)
 
-    users = [User(), User(), User()]
+    users = [User(), User(), User(is_admin=True)]
 
     store = Store(users=users, products=products)
 
     ui = Console()
     app = App(store=store, ui=ui)
 
-    options_list = [
-        Option(text="Ver productos", action=app.view_products),
-        Option(text="Ver carrito", action=app.view_cart),
-        Option(text="Seleccionar producto", action=app.buy_product),
-        Option(text="Eliminar del carrito", action=app.remove_from_cart),
-        Option(text="Finalizar compra", action=app.checkout),
-        Option(text="Cambiar perfil", action=app.login),
-        Option(text="Salir", action=app.exit_app),
-    ]
-
-    options = Options(options=options_list)
-
-    app.set_options(options)
+    
 
     app.start()
