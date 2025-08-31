@@ -36,13 +36,16 @@ class SpecialPriceRule(IPriceRule):
 
     @staticmethod
     def calculate_total(qty: float, price: float) -> float:
+        qty = int(qty)  
 
         if(qty < SpecialPriceRule.QUANTITY_THRESHOLD):
             return qty * price
 
-        total_discount = qty // SpecialPriceRule.QUANTITY_THRESHOLD
+        amount_buyed_to_discount = qty // SpecialPriceRule.QUANTITY_THRESHOLD
+        
+        total_discount = amount_buyed_to_discount * SpecialPriceRule.DISCOUNT
 
         if total_discount > SpecialPriceRule.DISCOUNT_TOP:
             return qty * price * (1 - SpecialPriceRule.DISCOUNT_TOP)
 
-        return qty * price * (1 - SpecialPriceRule.DISCOUNT)
+        return qty * price * (1 - total_discount)

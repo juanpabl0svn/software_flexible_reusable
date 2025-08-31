@@ -7,7 +7,7 @@ from dataclasses import dataclass
 class User:
   cart: Cart
 
-  def add_item_to_cart(self, product: Product, qty: int):
+  def add_item_to_cart(self, product: Product, qty: float):
       self.cart.add_item(product, qty)
 
   def remove_item_from_cart(self, item: Item):

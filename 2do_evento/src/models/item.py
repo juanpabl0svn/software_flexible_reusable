@@ -5,7 +5,7 @@ from src.models.rules_manager import RulesManager
 @dataclass
 class Item:
   product: Product
-  qty: int
+  qty: float
 
   def calculate_total(self) -> float:
     price_rule = RulesManager.get_rule(self.product.sku)

@@ -6,7 +6,7 @@ class Cart:
 
     items: list[Item] = []
 
-    def add_item(self, product: Product, qty: int):
+    def add_item(self, product: Product, qty: float):
         item = Item(product=product, qty=qty)   
         self.items.append(item)
 

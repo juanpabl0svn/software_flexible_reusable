@@ -11,3 +11,11 @@ class Console:
         except ValueError:
             self.show_message("Entrada inválida.")
             return None
+
+
+    def ask_float(self, prompt: str) -> float | None:
+        try:
+            return float(input(prompt))
+        except ValueError:
+            self.show_message("Entrada inválida.")
+            return None

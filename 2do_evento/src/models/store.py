@@ -10,7 +10,7 @@ class Store:
     products: list[Product]
     total_sells: float = 0.0
 
-    def add_product_to_cart(self, user: User, product: Product, qty: int):
+    def add_product_to_cart(self, user: User, product: Product, qty: float):
         item = user.cart.get_item_from_cart(product)
         if item:
             item.qty += qty

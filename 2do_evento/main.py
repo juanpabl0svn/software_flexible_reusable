@@ -58,7 +58,7 @@ class App:
         if not product:
             return
 
-        qty = self.ui.ask_int(f"Cantidad de '{product.name}' a comprar: ")
+        qty = self.ui.ask_float(f"Cantidad de '{product.name}' a comprar: ")
         if not qty or qty <= 0:
             self.ui.show_message("Cantidad inválida.")
             return
@@ -127,6 +127,8 @@ class App:
         while True:
             self.display_menu()
             choice = self.ui.ask_int("Seleccione una opción: ")
+            if choice is None:
+                continue
             self.options.execute_option(choice)
 
 
