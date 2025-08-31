@@ -55,7 +55,8 @@ class App:
         self.show_products()
         product: Product = self.select_from_list(
             self.store.products, "Seleccione producto (número): ")
-        if not product:
+        if not product or not product.has_units():
+            self.ui.show_message("Producto inválido o sin stock.")
             return
 
         qty = self.ui.ask_float(f"Cantidad de '{product.name}' a comprar: ")
@@ -66,6 +67,8 @@ class App:
         if product.units_available < qty:
             self.ui.show_message("No hay suficiente stock disponible.")
             return
+        
+        qty = product.get_qty(qty)
 
         self.store.add_product_to_cart(self.current_user, product, qty)
 
@@ -101,6 +104,10 @@ class App:
         cart = self.current_user.cart
         if not cart.items:
             self.ui.show_message("Carrito vacío.")
+            return
+        
+        if not self.store.can_purchase(self.current_user):
+            self.ui.show_message("No hay suficiente stock para completar la compra.")
             return
 
         self.ui.show_message("\n--- Resumen de compra ---")
@@ -158,6 +165,7 @@ if __name__ == "__main__":
         Option(text="Ver carrito", action=app.view_cart),
         Option(text="Eliminar del carrito", action=app.remove_from_cart),
         Option(text="Finalizar compra", action=app.checkout),
+        Option(text="Perfil", action=app.login),
         Option(text="Salir", action=app.exit_app),
     ]
 

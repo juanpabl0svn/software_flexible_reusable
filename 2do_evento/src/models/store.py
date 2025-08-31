@@ -16,7 +16,6 @@ class Store:
             item.qty += qty
         else:
             user.cart.add_item(product, qty)
-        product.units_available -= qty
 
     def delete_item_from_cart(self, user: User, item: Item):
         user.cart.remove_item(item)
@@ -24,4 +23,12 @@ class Store:
 
     def finish_order(self, user: User):
         self.total_sells += user.cart.calculate_total()
+        for item in user.cart.items:
+            item.product.units_available -= item.qty
         user.cart.items.clear()
+        
+    def can_purchase(self, user: User) -> bool:
+        for item in user.cart.items:
+            if item.qty > item.product.units_available:
+                return False
+        return True    

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from src.models.rules_manager import RulesManager
 
 @dataclass
 class Product:
@@ -16,3 +17,9 @@ class Product:
           self.units_available -= qty
           return True
       return False
+  
+  def get_qty(self, qty: float) -> float | int:
+      rule = RulesManager.get_rule(self.sku)
+      if rule:
+          return rule.get_qty(qty)
+      raise ValueError("No applicable pricing rule found.")

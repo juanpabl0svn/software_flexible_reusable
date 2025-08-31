@@ -10,6 +10,10 @@ class RegularPriceRule(IPriceRule):
     def calculate_total(qty: float, price: float) -> float:
         qty = int(qty)
         return qty * price
+    
+    @staticmethod
+    def get_qty(qty: float) -> float | int:
+        return int(qty)
 
 
 class WeightBasedPriceRule(IPriceRule):
@@ -20,6 +24,10 @@ class WeightBasedPriceRule(IPriceRule):
     @staticmethod
     def calculate_total(qty: float, price: float) -> float:
         return qty * price
+
+    @staticmethod
+    def get_qty(qty: float) -> float | int:
+        return qty
 
 
 class SpecialPriceRule(IPriceRule):
@@ -33,6 +41,10 @@ class SpecialPriceRule(IPriceRule):
     @staticmethod
     def is_applicable(sku: str):
         return sku[:2].upper() == "SP"
+
+    @staticmethod
+    def get_qty(qty: float) -> float | int:
+        return int(qty)
 
     @staticmethod
     def calculate_total(qty: float, price: float) -> float:

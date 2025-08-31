@@ -10,3 +10,7 @@ class IPriceRule(ABC):
     @abstractmethod
     def calculate_total(self, qty: float, price: float) -> float:
         pass
+    
+    @abstractmethod
+    def get_qty(self, qty: float) -> float | int:
+        pass
