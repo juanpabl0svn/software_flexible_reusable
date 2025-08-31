@@ -18,14 +18,15 @@ class App:
     ui: Console
     current_user: User | None = None
     options: Options | None = None
+    users: list[User]
 
     def login(self):
         self.ui.show_message("\n=== Iniciar sesión ===")
-        for idx, user in enumerate(self.store.users):
+        for idx, user in enumerate(self.users):
             self.ui.show_message(
                 f"{idx+1}. Usuario {idx+1} {'(Admin)' if user.is_admin else ''}")
 
-        user = ListManipulation.select_from_list(self.store.users, "Seleccione usuario: ", self.ui)
+        user = ListManipulation.select_from_list(self.users, "Seleccione usuario: ", self.ui)
         if user:
             self.current_user = user
             self.ui.show_message(f"Sesión iniciada\n")
@@ -194,9 +195,9 @@ if __name__ == "__main__":
 
     users = [User(), User(), User(is_admin=True)]
 
-    store = Store(users=users, products=products)
+    store = Store(products=products)
 
     ui = Console()
-    app = App(store=store, ui=ui)
+    app = App(store=store, ui=ui, users=users)
 
     app.start()

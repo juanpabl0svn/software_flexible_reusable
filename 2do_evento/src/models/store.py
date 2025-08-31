@@ -6,7 +6,6 @@ from dataclasses import dataclass
 
 @dataclass
 class Store:
-    users: list[User]
     products: list[Product]
     total_sales: float = 0.0
 
