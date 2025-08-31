@@ -4,7 +4,10 @@ from src.models.product import Product
 
 class Cart:
 
-    items: list[Item] = []
+    items: list[Item]
+
+    def __init__(self):
+        self.items = []
 
     def add_item(self, product: Product, qty: float):
         item = Item(product=product, qty=qty)   

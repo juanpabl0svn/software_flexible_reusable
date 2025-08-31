@@ -67,7 +67,7 @@ class App:
         if product.units_available < qty:
             self.ui.show_message("No hay suficiente stock disponible.")
             return
-        
+
         qty = product.get_qty(qty)
 
         self.store.add_product_to_cart(self.current_user, product, qty)
@@ -105,9 +105,10 @@ class App:
         if not cart.items:
             self.ui.show_message("Carrito vacío.")
             return
-        
+
         if not self.store.can_purchase(self.current_user):
-            self.ui.show_message("No hay suficiente stock para completar la compra.")
+            self.ui.show_message(
+                "No hay suficiente stock para completar la compra.")
             return
 
         self.ui.show_message("\n--- Resumen de compra ---")
@@ -153,7 +154,7 @@ if __name__ == "__main__":
     RulesManager.add_rule(WeightBasedPriceRule)
     RulesManager.add_rule(SpecialPriceRule)
 
-    users = [User(cart=Cart()), User(cart=Cart())]
+    users = [User(), User(), User()]
 
     store = Store(users=users, products=products)
 
