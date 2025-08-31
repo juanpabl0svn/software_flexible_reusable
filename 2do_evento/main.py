@@ -16,9 +16,9 @@ from src.utils.list_manipulation import ListManipulation
 class App:
     store: Store
     ui: Console
+    users: list[User]
     current_user: User | None = None
     options: Options | None = None
-    users: list[User]
 
     def login(self):
         self.ui.show_message("\n=== Iniciar sesión ===")
@@ -122,35 +122,16 @@ class App:
         else:
             self.ui.show_message("Compra cancelada.")
 
-    def view_products(self):
-        self.ui.show_message("\n--- Productos Disponibles ---")
-        for idx, p in enumerate(self.store.products):
-            self.ui.show_message(
-                f"{idx+1}. {p.name} | {p.description} | Stock: {p.units_available} | Precio: ${p.unit_price}"
-            )
-
     def exit_app(self):
         self.ui.show_message("Saliendo...")
         raise SystemExit
-
-    def start(self):
-        if not self.options:
-            raise ValueError("Options are required.")
-
-        self.login()
-        while True:
-            self.display_menu()
-            choice = self.ui.ask_int("Seleccione una opción: ")
-            if choice is None:
-                continue
-            self.options.execute_option(choice)
 
     def set_options(self):
 
         ALL_OPTIONS = [
             Option(text="Ver total de ventas",
                    action=app.view_total_sales, admin_only=True),
-            Option(text="Ver productos", action=app.view_products),
+            Option(text="Ver productos", action=app.show_products),
             Option(text="Ver carrito", action=app.view_cart),
             Option(text="Seleccionar producto", action=app.buy_product),
             Option(text="Eliminar del carrito", action=app.remove_from_cart),
