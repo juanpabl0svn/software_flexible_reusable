@@ -137,6 +137,8 @@ class App:
             Option(text="Eliminar del carrito", action=app.remove_from_cart),
             Option(text="Finalizar compra", action=app.checkout),
             Option(text="Cambiar perfil", action=app.login),
+            Option(text="Cambiar perfil", action=app.login, admin_only=True),
+            Option(text="Salir", action=app.exit_app, admin_only=True),
             Option(text="Salir", action=app.exit_app),
         ]
 
