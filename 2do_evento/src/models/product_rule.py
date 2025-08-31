@@ -1,7 +1,7 @@
-from src.interfaces.price_rule_interface import IPriceRule
+from src.interfaces.product_rule_interface import IProductRule
 
 
-class RegularPriceRule(IPriceRule):
+class RegularProductRule(IProductRule):
     @staticmethod
     def is_applicable(sku: str):
         return sku[:2].upper() == "EA"
@@ -16,7 +16,7 @@ class RegularPriceRule(IPriceRule):
         return int(qty)
 
 
-class WeightBasedPriceRule(IPriceRule):
+class WeightBasedProductRule(IProductRule):
     @staticmethod
     def is_applicable(sku: str):
         return sku[:2].upper() == "WE"
@@ -30,7 +30,7 @@ class WeightBasedPriceRule(IPriceRule):
         return qty
 
 
-class SpecialPriceRule(IPriceRule):
+class SpecialProductRule(IProductRule):
 
     DISCOUNT = 0.2
 
@@ -50,14 +50,14 @@ class SpecialPriceRule(IPriceRule):
     def calculate_total(qty: float, price: float) -> float:
         qty = int(qty)  
 
-        if(qty < SpecialPriceRule.QUANTITY_THRESHOLD):
+        if(qty < SpecialProductRule.QUANTITY_THRESHOLD):
             return qty * price
 
-        amount_buyed_to_discount = qty // SpecialPriceRule.QUANTITY_THRESHOLD
-        
-        total_discount = amount_buyed_to_discount * SpecialPriceRule.DISCOUNT
+        amount_buyed_to_discount = qty // SpecialProductRule.QUANTITY_THRESHOLD
 
-        if total_discount > SpecialPriceRule.DISCOUNT_TOP:
-            return qty * price * (1 - SpecialPriceRule.DISCOUNT_TOP)
+        total_discount = amount_buyed_to_discount * SpecialProductRule.DISCOUNT
+
+        if total_discount > SpecialProductRule.DISCOUNT_TOP:
+            return qty * price * (1 - SpecialProductRule.DISCOUNT_TOP)
 
         return qty * price * (1 - total_discount)

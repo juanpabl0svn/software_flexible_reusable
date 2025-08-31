@@ -1,1 +1,1 @@
-from . import product, user, store, cart, item, rules_manager, console, price_rule
+from . import product, product_rule, user, store, cart, item, rules_manager, console

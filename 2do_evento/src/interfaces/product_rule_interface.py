@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class IPriceRule(ABC):
+class IProductRule(ABC):
 
     @abstractmethod
     def is_applicable(self, sku: str):

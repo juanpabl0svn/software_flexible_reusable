@@ -5,10 +5,11 @@ from src.models.user import User
 from src.models.cart import Cart
 from src.models.item import Item
 from src.models.rules_manager import RulesManager
-from src.models.price_rule import RegularPriceRule, WeightBasedPriceRule, SpecialPriceRule
+from src.models.product_rule import RegularProductRule, WeightBasedProductRule, SpecialProductRule
 from src.models.console import Console
 from src.models.options import Options
 from src.models.option import Option
+from src.utils.list_manipulation import ListManipulation
 
 
 @dataclass
@@ -18,19 +19,13 @@ class App:
     current_user: User | None = None
     options: Options | None = None
 
-    def select_from_list(self, items: list, prompt: str):
-        choice = self.ui.ask_int(prompt)
-        if choice is None or not (1 <= choice <= len(items)):
-            self.ui.show_message("Selección inválida.")
-            return None
-        return items[choice - 1]
-
     def login(self):
         self.ui.show_message("\n=== Iniciar sesión ===")
         for idx, user in enumerate(self.store.users):
-            self.ui.show_message(f"{idx+1}. Usuario {idx+1} {'(Admin)' if user.is_admin else ''}")
+            self.ui.show_message(
+                f"{idx+1}. Usuario {idx+1} {'(Admin)' if user.is_admin else ''}")
 
-        user = self.select_from_list(self.store.users, "Seleccione usuario: ")
+        user = ListManipulation.select_from_list(self.store.users, "Seleccione usuario: ", self.ui)
         if user:
             self.current_user = user
             self.ui.show_message(f"Sesión iniciada\n")
@@ -56,8 +51,8 @@ class App:
 
     def buy_product(self):
         self.show_products()
-        product: Product = self.select_from_list(
-            self.store.products, "Seleccione producto (número): ")
+        product: Product = ListManipulation.select_from_list(
+            self.store.products, "Seleccione producto (número): ", self.ui)
         if not product or not product.has_units():
             self.ui.show_message("Producto inválido o sin stock.")
             return
@@ -95,8 +90,8 @@ class App:
             return
 
         self.view_cart()
-        item: Item = self.select_from_list(
-            cart.items, "Seleccione producto a eliminar (número): ")
+        item: Item = ListManipulation.select_from_list(
+            cart.items, "Seleccione producto a eliminar (número): ", self.ui)
         if not item:
             return
 
@@ -152,7 +147,8 @@ class App:
     def set_options(self):
 
         ALL_OPTIONS = [
-            Option(text="Ver total de ventas", action=app.view_total_sales, admin_only=True),
+            Option(text="Ver total de ventas",
+                   action=app.view_total_sales, admin_only=True),
             Option(text="Ver productos", action=app.view_products),
             Option(text="Ver carrito", action=app.view_cart),
             Option(text="Seleccionar producto", action=app.buy_product),
@@ -162,7 +158,7 @@ class App:
             Option(text="Salir", action=app.exit_app),
         ]
 
-        is_admin = self.current_user.is_admin 
+        is_admin = self.current_user.is_admin
 
         options = []
 
@@ -177,10 +173,10 @@ class App:
         self.login()
         while True:
             self.display_menu()
-            choice = self.ui.ask_int("Seleccione una opción: ")
-            if choice is None:
-                continue
-            self.options.execute_option(choice)
+            selected_option = ListManipulation.select_from_list(self.options.options, "Seleccione una opción: ", self.ui)
+            if selected_option:
+                selected_option.action()
+
 
 if __name__ == "__main__":
     products = [
@@ -192,9 +188,9 @@ if __name__ == "__main__":
                 units_available=15, unit_price=2.5),
     ]
 
-    RulesManager.add_rule(RegularPriceRule)
-    RulesManager.add_rule(WeightBasedPriceRule)
-    RulesManager.add_rule(SpecialPriceRule)
+    RulesManager.add_rule(RegularProductRule)
+    RulesManager.add_rule(WeightBasedProductRule)
+    RulesManager.add_rule(SpecialProductRule)
 
     users = [User(), User(), User(is_admin=True)]
 
@@ -202,7 +198,5 @@ if __name__ == "__main__":
 
     ui = Console()
     app = App(store=store, ui=ui)
-
-    
 
     app.start()

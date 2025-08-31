@@ -1,1 +1,1 @@
-from . import price_rule_interface
+from . import product_rule_interface
