@@ -123,6 +123,13 @@ class App:
         else:
             self.ui.show_message("Compra cancelada.")
 
+    def view_products(self):
+        self.ui.show_message("\n--- Productos Disponibles ---")
+        for idx, p in enumerate(self.store.products):
+            self.ui.show_message(
+                f"{idx+1}. {p.name} | {p.description} | Stock: {p.units_available} | Precio: ${p.unit_price}"
+            )
+
     def exit_app(self):
         self.ui.show_message("Saliendo...")
         raise SystemExit
@@ -162,11 +169,12 @@ if __name__ == "__main__":
     app = App(store=store, ui=ui)
 
     options_list = [
-        Option(text="Comprar producto", action=app.buy_product),
+        Option(text="Ver productos", action=app.view_products),
         Option(text="Ver carrito", action=app.view_cart),
+        Option(text="Seleccionar producto", action=app.buy_product),
         Option(text="Eliminar del carrito", action=app.remove_from_cart),
         Option(text="Finalizar compra", action=app.checkout),
-        Option(text="Perfil", action=app.login),
+        Option(text="Cambiar perfil", action=app.login),
         Option(text="Salir", action=app.exit_app),
     ]
 

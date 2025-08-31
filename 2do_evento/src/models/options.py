@@ -17,7 +17,7 @@ class Options:
 
   def execute_option(self, index: int) -> bool:
       option_selected = index - 1
-      if 0 <= index < len(self.options):
+      if 0 <= option_selected < len(self.options):
           self.options[option_selected].execute_action()
           return True
       print("Invalid option.")
