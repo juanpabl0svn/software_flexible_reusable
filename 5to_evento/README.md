@@ -1,11 +1,51 @@
-CODE SMELL
+# 🚨 Code Smells Identificados
 
-God Class: todo estaba dentro de una sola clase gigante (Game), manejando jugadores, preguntas, lógica de penalización, movimientos, etc.
+## 1. God Class
+- Todo estaba dentro de una sola clase gigante (**Game**).
+- La clase manejaba **jugadores, preguntas, lógica de penalización, movimientos**, etc.
+- Esto la hacía difícil de mantener y extender.
 
-Métodos largos: había métodos como roll con muchas responsabilidades (tirar dado, mover jugador, verificar penalización, preguntar, etc.).
+---
 
-Complejidad cognitiva: muchos if, ciclos, y condiciones anidadas.
+## 2. Métodos Largos
+- Ejemplo: el método `roll` tenía **muchas responsabilidades**:
+  - Tirar dado 🎲  
+  - Mover jugador 🏃  
+  - Verificar penalización 🚫  
+  - Seleccionar categoría ❓  
+  - Hacer preguntas 📝  
 
-Código duplicado: repetición en la selección de categorías y en el manejo de jugadores.
+---
 
-Grupo de datos: datos como name, purse, place, in_penalty_box estaban juntos sin encapsularlos en un objeto (Player).
+## 3. Complejidad Cognitiva
+- Existían **muchos `if`, ciclos y condiciones anidadas**.  
+- Esto dificultaba entender la lógica y aumentaba el riesgo de errores.
+
+---
+
+## 4. Código Duplicado
+- Se repetía lógica en:
+  - La **selección de categorías**.  
+  - El **manejo de jugadores**.
+
+---
+
+## 5. Grupo de Datos
+- Datos como:
+  - `name`  
+  - `purse`  
+  - `place`  
+  - `in_penalty_box`  
+
+Estaban juntos sin encapsularse en un objeto.  
+➡️ Se resolvió creando la clase **`Player`**.
+
+
+
+
+### Integrantes
+
+````bash
+Juan Pablo Aguirre
+Luigi Nieves
+Juan Pablo Sanchez
