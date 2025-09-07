@@ -3,10 +3,10 @@ from ..models.request import Request
 from ..models.response import Response
 from ..enum.status_code import StatusCode
 from ..services.order_service import OrderService
-from ..interface.controller import Controller
+from ..interface.request_handler import RequestHandler
 
 
-class OrderController(Controller):
+class OrderController(RequestHandler):
     order_service: OrderService
 
     def __init__(self):

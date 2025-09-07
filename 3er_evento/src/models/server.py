@@ -3,7 +3,6 @@ from typing import Optional
 from ..interface.request_handler import RequestHandler
 from .request import Request
 from .response import Response
-from ..interface.controller import Controller
 from ..controllers.order import OrderController
 
 
@@ -12,7 +11,7 @@ class Server:
 
     middlewares: list[RequestHandler]
 
-    controller: Controller
+    controller: RequestHandler
 
     def __init__(self):
         self.middlewares = []
